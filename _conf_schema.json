@@ -1,0 +1,112 @@
+{
+  "engine": {
+    "description": "搜索引擎",
+    "type": "string",
+    "options": ["auto", "bing", "ddg", "tavily"],
+    "default": "auto",
+    "hint": "bing=必应（国内直连最稳）；ddg=DuckDuckGo（需网络可达）；tavily=Tavily API（质量最好，需填 tavily_api_key）；auto=配了 Tavily 密钥时先 tavily，失败回退 bing→ddg，未配密钥则 bing→ddg"
+  },
+  "tavily_api_key": {
+    "description": "Tavily API Key",
+    "type": "string",
+    "default": "",
+    "hint": "留空则不启用 Tavily；到 app.tavily.com 免费注册获取（tvly- 开头，每月 1000 次免费额度），填了之后 auto 模式也会优先用 Tavily"
+  },
+  "tavily_depth": {
+    "description": "Tavily 搜索深度",
+    "type": "string",
+    "options": ["basic", "advanced"],
+    "default": "basic",
+    "hint": "advanced 结果质量更好但消耗 2 倍额度（免费 1000 次/月 ≈ 500 次）"
+  },
+  "tavily_include_answer": {
+    "description": "Tavily 返回综合答案",
+    "type": "bool",
+    "default": false,
+    "hint": "开启后 Tavily 会额外生成一段综合答案，随搜索结果一起给 AI，通常能减少二次搜索；会略微增加额度消耗"
+  },
+  "max_results": {
+    "description": "每次搜索返回的条数",
+    "type": "int",
+    "default": 5,
+    "hint": "1-10（代码硬上限 10）。条数越多信息越全，但配合下面的 total 字数上限才安全"
+  },
+  "snippet_max_chars": {
+    "description": "单条摘要最大字数",
+    "type": "int",
+    "default": 220,
+    "hint": "针对每条结果的内容做截断，是防止上下文被撑爆的主闸门。Tavily 返回的是整页正文（常有 1000+ 字），必须靠它砍；0 为不限制（不建议）"
+  },
+  "max_total_chars": {
+    "description": "单次搜索返回的总字数上限",
+    "type": "int",
+    "default": 3500,
+    "hint": "一次 web_search 调用最多给 AI 这么多字，超出则截断剩余条数。0 为不限制"
+  },
+  "max_calls_per_minute": {
+    "description": "同一会话每分钟最多搜索次数",
+    "type": "int",
+    "default": 8,
+    "hint": "防止 AI 在一轮对话里反复换词狂搜导致上下文暴涨。超限后会提示 AI 用已有信息作答。0 为不限制"
+  },
+  "session_max_chars": {
+    "description": "同一会话累计注入对话的搜索字数上限",
+    "type": "int",
+    "default": 15000,
+    "hint": "累计（含命中缓存的重复搜索、web_read 读取的正文）达到上限后不再返回新结果，强制 AI 收尾作答。这是上下文总量的最终闸门。0 为不限制"
+  },
+  "session_budget_idle_minutes": {
+    "description": "会话字数预算空闲重置（分钟）",
+    "type": "int",
+    "default": 30,
+    "hint": "同一会话超过这么多分钟没有联网操作，就重置累计字数预算，避免群聊长期运行后永久无法再搜索。0 表示从不重置"
+  },
+  "timeout": {
+    "description": "请求超时（秒）",
+    "type": "int",
+    "default": 10
+  },
+  "cache_ttl": {
+    "description": "搜索结果缓存时长（秒，0 为关闭）",
+    "type": "int",
+    "default": 300,
+    "hint": "相同关键词短时间内直接用缓存，防止被搜索引擎限流"
+  },
+  "paraphrase_hint": {
+    "description": "要求 AI 口语化转述（不逐条罗列）",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后 AI 可能按原始列表格式复述结果"
+  },
+  "web_read_max_chars": {
+    "description": "网页阅读单次返回的最大字数",
+    "type": "int",
+    "default": 6000,
+    "hint": "web_read 打开网页最多返回这么多字，防止长文撑爆 AI 上下文；0 为不限制"
+  },
+  "web_read_max_bytes": {
+    "description": "网页阅读单次下载的最大字节数",
+    "type": "int",
+    "default": 2000000,
+    "hint": "流式读取，超过上限就截断，防止超大页面或恶意响应打爆内存；默认约 2MB"
+  },
+  "max_web_read_per_minute": {
+    "description": "同一会话每分钟最多网页阅读次数",
+    "type": "int",
+    "default": 5,
+    "hint": "web_read 单次最多返回几千字，不限次会被 AI 用来反复读网页撑爆上下文。0 为不限制"
+  },
+  "bing_market": {
+    "description": "Bing 市场区域",
+    "type": "string",
+    "options": ["zh-CN", "en-US", "zh-TW", "ja-JP"],
+    "default": "zh-CN",
+    "hint": "影响 Bing 返回结果的地区和语言"
+  },
+  "proxy": {
+    "description": "HTTP 代理地址",
+    "type": "string",
+    "default": "",
+    "hint": "可选，例如 http://127.0.0.1:7890 或 socks5://127.0.0.1:1080。国内访问 DuckDuckGo / Tavily 时通常需要；留空则直连"
+  }
+}
